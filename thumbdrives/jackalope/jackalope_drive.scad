@@ -1,17 +1,17 @@
 
-union() {
-    
-    translate([0,0,2])
-    !import("jackalope_head_cap.stl");
-
-    cube([35, 17, 2], center=true);
-}
+//union() {
+//   
+//    scale([0.5,0.5,0.5])
+//    import("jackalope_head_cap.stl");
+//
+//    cube([35, 17, 2], center=true);
+//}
 
 // Thumbdrive base
-difference() {
-cube([35, 17, 5.1]);
+!difference() {
+cube([35, 17, 5.6]);
 translate([0,0,1])
-linear_extrude(4.1)
+linear_extrude(4.6)
 scale([35.5/35, 1, 1])
 translate([-16.80, 17,0])
 rotate([180,0,0])
