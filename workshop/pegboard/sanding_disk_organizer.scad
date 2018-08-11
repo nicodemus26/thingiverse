@@ -2,70 +2,70 @@
 // Changable
 
 // Pick Sizes for each compartment bottom to top
-//SIZES = ["320", "220", "180", "120", "80", "40"];
-SIZES = ["2000", "1500", "1200", "1000", "800", "600"];
+//compartments = ["320", "220", "180", "120", "80", "40"];
+compartments = ["2000", "1500", "1200", "1000", "800", "600"];
 // Number of compartments
-NO_COMPARTMENTS=len(SIZES); 
+compartment_count=len(compartments); 
 // Disk Size in Inch (tested 5)
-DISK_SIZE=5; // In Inches
+disk_diam=5; // In Inches
 
 //--------------------------------------------
 
-CONV=25.4;
+mm_per_in=25.4;
 
-THICKNESS=1.2;
-COMPARTMENT_H=1*CONV+(THICKNESS*2);
-BACKPLATE_W=((DISK_SIZE+.25)*CONV)+(THICKNESS*2);
+wall=1.2;
+compartment_height=1*mm_per_in+(wall*2);
+backplate_width=((disk_diam+.25)*mm_per_in)+(wall*2);
 
 
-HANG_TAB=18;
-HOLE_RADIUS=3.3;
-HOLE_DISTANCE=2*CONV;
+hang_tab_height=18;
+peg_hole_radius=3.3;
+peg_hole_distance=2*mm_per_in;
 
-PULLOUT_RADIUS=1.25*CONV;
+pullout_radius=1.25*mm_per_in;
 
-LABEL_EXTRUDE=.4;
+lable_extrude=.4;
 
 //echo(getsplit("123 456 789", 0)); // ECHO: "789"
 
 module make_peg_holes(cp_h) {
-    holeable_space=BACKPLATE_W-(THICKNESS*2)-(HOLE_RADIUS*2);
-    holes=round(holeable_space/HOLE_DISTANCE-.5);
-    side_gap=(holeable_space-(holes*HOLE_DISTANCE))/2+THICKNESS+HOLE_RADIUS;
+    holeable_space=backplate_width-(wall*2)-(peg_hole_radius*2);
+    holes=round(holeable_space/peg_hole_distance-.5);
+    side_gap=(holeable_space-(holes*peg_hole_distance))/2+wall+peg_hole_radius;
     echo(holeable_space);
     echo(holes);
     echo(side_gap);
     
     for ( i = [0 : holes] ) {
-        translate([side_gap+i*HOLE_DISTANCE,(cp_h+HANG_TAB)-(HOLE_RADIUS*2),0])
-		cylinder(h = THICKNESS+.2, r=HOLE_RADIUS,$fn=20);
+        translate([side_gap+i*peg_hole_distance,(cp_h+hang_tab_height)-(peg_hole_radius*2),0])
+		cylinder(h = wall+.2, r=peg_hole_radius,$fn=20);
     }
 }
 
 module make_back_wall(cp_h) {
 
 	
-	cube([BACKPLATE_W,cp_h+HANG_TAB,THICKNESS]);
+	cube([backplate_width,cp_h+hang_tab_height,wall]);
 
 
 }
 
 module make_compartment(cpn) {
 
-	translate([0,cpn*(COMPARTMENT_H-THICKNESS),0]) {
+	translate([0,cpn*(compartment_height-wall),0]) {
 	difference() {
-		cube([BACKPLATE_W,COMPARTMENT_H,DISK_SIZE*CONV]);
-		translate([THICKNESS,THICKNESS,THICKNESS]) {
-			cube([BACKPLATE_W-(THICKNESS*2),COMPARTMENT_H-(THICKNESS*2),(DISK_SIZE*CONV)]);
+		cube([backplate_width,compartment_height,disk_diam*mm_per_in]);
+		translate([wall,wall,wall]) {
+			cube([backplate_width-(wall*2),compartment_height-(wall*2),(disk_diam*mm_per_in)]);
 		}
 	
 
-		translate([(BACKPLATE_W)/2,0,DISK_SIZE*CONV]) {
+		translate([(backplate_width)/2,0,disk_diam*mm_per_in]) {
 			rotate([270,0,0]) {
                 hull() {
-                    cylinder(h = COMPARTMENT_H+.1, r=PULLOUT_RADIUS,$fn=56);
-                    translate([0,BACKPLATE_W-PULLOUT_RADIUS*1.5,0])
-                    cylinder(h = COMPARTMENT_H+.1, r=PULLOUT_RADIUS,$fn=56);
+                    cylinder(h = compartment_height+.1, r=pullout_radius,$fn=56);
+                    translate([0,backplate_width-pullout_radius*1.5,0])
+                    cylinder(h = compartment_height+.1, r=pullout_radius,$fn=56);
                 }
 			}
 		}
@@ -79,7 +79,7 @@ module make_compartment(cpn) {
 module make_text_tabs(shift) {
 
     translate([shift,0,0]) {
-        cube([22,(NO_COMPARTMENTS*(COMPARTMENT_H-THICKNESS)),THICKNESS]);
+        cube([22,(compartment_count*(compartment_height-wall)),wall]);
     }
     
     
@@ -89,41 +89,41 @@ module make_text_tabs(shift) {
 
     difference() {
     hull() {
-        make_back_wall(NO_COMPARTMENTS*(COMPARTMENT_H-THICKNESS));
+        make_back_wall(compartment_count*(compartment_height-wall));
         //make_text_tabs(-4);
-        //make_text_tabs(BACKPLATE_W);    
+        //make_text_tabs(backplate_width);    
     }
-        make_peg_holes(NO_COMPARTMENTS*(COMPARTMENT_H-THICKNESS));
+        make_peg_holes(compartment_count*(compartment_height-wall));
     }
 
 
 union() {
     
-    for ( i = [0 : NO_COMPARTMENTS-1] ) {
+    for ( i = [0 : compartment_count-1] ) {
         make_compartment(i);
     }
 }
 
 union() {
-    for ( i = [0 : NO_COMPARTMENTS-1] ) {
+    for ( i = [0 : compartment_count-1] ) {
         do_label(i,0,1);
-        translate([LABEL_EXTRUDE/2, 0, -LABEL_EXTRUDE/2])
+        translate([lable_extrude/2, 0, -lable_extrude/2])
         do_label(i,0,1);
         
-        do_label(i,BACKPLATE_W+LABEL_EXTRUDE,-1);
-        translate([-LABEL_EXTRUDE/2, 0, -LABEL_EXTRUDE/2])
-        do_label(i,BACKPLATE_W+LABEL_EXTRUDE,-1);
+        do_label(i,backplate_width+lable_extrude,-1);
+        translate([-lable_extrude/2, 0, -lable_extrude/2])
+        do_label(i,backplate_width+lable_extrude,-1);
     }    
 }
 
 
 module do_label(cph,shift,side) {
     align = (side > 0) ? "right" : "left";
-    ts=COMPARTMENT_H/2;
-    translate([shift,0,DISK_SIZE*CONV-THICKNESS])
+    ts=compartment_height/2;
+    translate([shift,0,disk_diam*mm_per_in-wall])
     rotate([0,-90*side,0])
-    translate([0,cph*(COMPARTMENT_H-THICKNESS),0])    
-    linear_extrude(height = LABEL_EXTRUDE, center = false, convexity = 0, twist = 0) 
-    translate([0, COMPARTMENT_H/4]) 
-    text(SIZES[cph], font = "Liberation Sans",halign=align,size = ts);
+    translate([0,cph*(compartment_height-wall),0])    
+    linear_extrude(height = lable_extrude, center = false, convexity = 0, twist = 0) 
+    translate([0, compartment_height/4]) 
+    text(compartments[cph], font = "Liberation Sans",halign=align,size = ts);
 }
