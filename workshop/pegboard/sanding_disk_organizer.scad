@@ -119,8 +119,8 @@ union() {
         do_label(i,0,1);
         
         // Right label
-        do_label(i,backplate_width+lable_extrude,-1);
+        do_label(i,backplate_width,-1);
         translate([-lable_extrude/2, 0, -lable_extrude/2])
-        do_label(i,backplate_width+lable_extrude,-1);
+        do_label(i,backplate_width,-1);
     }    
 }
