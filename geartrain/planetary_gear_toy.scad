@@ -11,10 +11,10 @@ triangle_side=big_gear_radius*2+tooth_depth+small_gear_radius*2;
 planetary_thickness=10;
 planetary_inner_radius=big_gear_radius+(triangle_side/2)/cos(30);
 planetary_outer_radius=planetary_inner_radius+planetary_thickness;
-big_to_outer_arm_len=triangle_side/2+planetary_thickness;
+big_to_outer_arm_len=big_gear_radius*2+tooth_depth+planetary_thickness;
 mat_thick=25.4/8;
 
-module gear(radius, num_teeth) {
+module gear(radius, num_teeth, mink=.5) {
     circumference=2*3.14159*radius;
     tooth_width=circumference/num_teeth/2-1;
     minkowski(){
@@ -29,7 +29,8 @@ module gear(radius, num_teeth) {
             };
             circle(r=axel_radius);
         };
-        circle(r=.5, $fn=12);
+        if(mink!=0)
+        circle(r=mink, $fn=12);
     }
 }
 
@@ -59,7 +60,7 @@ module billy_gears() {
     linear_extrude(mat_thick)
     rotate([0,0,30])
     translate([0,big_to_outer_arm_len])
-    gear(radius=small_gear_radius,num_teeth=small_num_teeth);
+    gear(radius=big_gear_radius,num_teeth=big_num_teeth);
 }
 
 module gear_shits() {
@@ -81,7 +82,7 @@ module gear_shits() {
     rotate([0,0,60])
     translate([0,-triangle_side])
     linear_extrude(mat_thick)
-    gear(radius=big_gear_radius,num_teeth=big_num_teeth);
+    !gear(radius=big_gear_radius,num_teeth=big_num_teeth);
     
     translate([0,-triangle_side])
     linear_extrude(mat_thick)
@@ -103,9 +104,11 @@ module gear_shits() {
 module orbit(){
     translate([(triangle_side/2)*tan(30),-triangle_side/2])
     linear_extrude(mat_thick)
-    difference(){
-        gear(radius=planetary_outer_radius, num_teeth=round(planetary_outer_radius));
-        gear(radius=planetary_inner_radius, num_teeth=round(planetary_inner_radius));
+    minkowski() {
+        difference(){
+            gear(radius=planetary_outer_radius, num_teeth=round(planetary_outer_radius), mink=.25);
+            gear(radius=planetary_inner_radius, num_teeth=round(planetary_inner_radius), mink=1);
+        };
     };
 }
 

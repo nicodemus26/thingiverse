@@ -1,19 +1,32 @@
 $fn=36;
-columns = 6;
+columns = 7;
 starting_offset=25;
-rows = 8;
-shape_scaling = .8;
-border_scaling = .9;
+rows = 7;
+shape_scaling = .7;
+border_scaling = .95;
 border = 1.5;
-layer_rot=36;
+layer_rot=80;
 
 
 module base_shape() {
-    rotate([0,0,45])
-    union() {
-        circle(r=15);
-        square(size=[50,7], center=true);
-        square(size=[7,50], center=true);
+    lobe_r=10;
+    lobe_disp=9;
+    translate([10,0])
+    scale(.5)
+    rotate([0,0,-36])
+    union(){
+        hull() {
+            translate([-lobe_disp,0])
+            circle(r=lobe_r);
+            translate([0,-lobe_disp*2])
+            circle(r=lobe_r/3);
+        };
+        hull() {
+            translate([lobe_disp,0])
+            circle(r=lobe_r);
+            translate([0,-lobe_disp*2])
+            circle(r=lobe_r/3);
+        };
     }
 };
 
